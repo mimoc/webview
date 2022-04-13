@@ -12,14 +12,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Web_link">
 
-        <activity android:name=".WebViewActivity"
-            android:exported="true">
-        <intent-filter>
-            <action android:name="com.example.web_link.WebViewActivity" />
-            <category android:name="android.intent.category.DEFAULT" />
-        </intent-filter>
-        </activity>
-
         <activity
             android:name=".MainActivity"
             android:exported="true"
