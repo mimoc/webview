@@ -7,14 +7,11 @@ import android.webkit.CookieManager;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.ui.AppBarConfiguration;
 
 public class MainActivity extends AppCompatActivity {
-
-    private AppBarConfiguration appBarConfiguration;
+    private static final String URL_HOMEINSTALLERS = "https://app.homeinstallers.co.uk";
 
     private WebView webViewurl;
 
@@ -22,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.webview);
-        webViewurl = (WebView) findViewById(R.id.webView1);
+        webViewurl = findViewById(R.id.webView1);
 
         webViewurl.getSettings().setBuiltInZoomControls(false);
         webViewurl.getSettings().setSupportZoom(false);
@@ -33,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
         final Activity activity = this;
         webViewurl.setWebViewClient(new WebViewClient() {
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                Toast.makeText(activity, description, Toast.LENGTH_SHORT).show();
             }
 
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
@@ -46,10 +42,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-
-        webViewurl.loadUrl("https://app.homeinstallers.co.uk");
-
-
+        webViewurl.loadUrl(URL_HOMEINSTALLERS);
     }
 
 }
