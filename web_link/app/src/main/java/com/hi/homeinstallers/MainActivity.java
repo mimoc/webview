@@ -1,6 +1,5 @@
-package com.example.web_link;
+package com.hi.homeinstallers;
 
-import android.app.Activity;
 import android.net.http.SslError;
 import android.os.Bundle;
 import android.webkit.CookieManager;
@@ -27,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
         webViewurl.getSettings().setJavaScriptEnabled(true);
         CookieManager.getInstance().setAcceptCookie(true);
 
-        final Activity activity = this;
         webViewurl.setWebViewClient(new WebViewClient() {
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             }

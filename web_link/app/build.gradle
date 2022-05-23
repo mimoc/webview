@@ -6,7 +6,7 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.example.web_link"
+        applicationId "com.hi.homeinstallers"
         minSdk 21
         targetSdk 32
         versionCode 1
