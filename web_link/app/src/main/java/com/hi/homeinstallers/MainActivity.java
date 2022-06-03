@@ -1,12 +1,16 @@
 package com.hi.homeinstallers;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Bundle;
+import android.util.Log;
 import android.webkit.CookieManager;
+import android.webkit.PermissionRequest;
 import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -18,6 +22,8 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
     private static final String URL_HOMEINSTALLERS = "https://app.homeinstallers.co.uk";
@@ -26,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ValueCallback<Uri[]> uploadMessageAboveL;
 
+
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,12 +51,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-                // ignore ssl error
-                if (handler != null) {
-                    handler.proceed();
-                } else {
                     super.onReceivedSslError(view, null, error);
-                }
             }
 
         });
@@ -69,10 +72,29 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
 
+
+        @Override
+        public void onPermissionRequest(final PermissionRequest request) {
+            MainActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                        request.grant(request.getResources());
+                }
+            });
+        }
         });
+
+        checkPermission();
 
         webViewurl.loadUrl(URL_HOMEINSTALLERS);
     }
+
+    private void checkPermission() {
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+        }
+    }
+
 
     private void openImageChooserActivity() {
         Intent i = new Intent(Intent.ACTION_GET_CONTENT);
