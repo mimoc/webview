@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Bundle;
-import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.PermissionRequest;
 import android.webkit.SslErrorHandler;
@@ -34,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-                    super.onReceivedSslError(view, null, error);
+                super.onReceivedSslError(view, null, error);
             }
 
         });
@@ -73,20 +73,35 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-        @Override
-        public void onPermissionRequest(final PermissionRequest request) {
-            MainActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
+            @Override
+            public void onPermissionRequest(final PermissionRequest request) {
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
                         request.grant(request.getResources());
-                }
-            });
-        }
+                    }
+                });
+            }
         });
 
         checkPermission();
 
-        webViewurl.loadUrl(URL_HOMEINSTALLERS);
+        if (savedInstanceState == null) {
+            webViewurl.loadUrl(URL_HOMEINSTALLERS);
+        }
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        webViewurl.saveState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        webViewurl.restoreState(savedInstanceState);
     }
 
     private void checkPermission() {
