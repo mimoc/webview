@@ -8,7 +8,9 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Bundle;
+import android.util.Log;
 import android.webkit.CookieManager;
+import android.webkit.GeolocationPermissions;
 import android.webkit.PermissionRequest;
 import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
@@ -20,11 +22,16 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
+    public String mGeolocationOrigin;
+    public GeolocationPermissions.Callback mGeolocationCallback;
+    private static final int REQUEST_FINE_LOCATION=0;
+
     private static final String URL_HOMEINSTALLERS = "https://app.homeinstallers.co.uk";
 
     private WebView webViewurl;
@@ -40,8 +47,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.webview);
         webViewurl = findViewById(R.id.webView1);
 
-        webViewurl.getSettings().setBuiltInZoomControls(false);
-        webViewurl.getSettings().setSupportZoom(false);
+        webViewurl.getSettings().setBuiltInZoomControls(true);
+        webViewurl.getSettings().setSupportZoom(true);
         webViewurl.getSettings().setDomStorageEnabled(true);
         webViewurl.getSettings().setJavaScriptEnabled(true);
         CookieManager.getInstance().setAcceptCookie(true);
@@ -82,7 +89,24 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
+
+
+            @Override
+            public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
+                String perm = Manifest.permission.ACCESS_FINE_LOCATION;
+
+                    if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, perm)) {
+                        // ask the user for permission
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[] {perm}, REQUEST_FINE_LOCATION);
+                        // we will use these when user responds
+                        mGeolocationOrigin = origin;
+                        mGeolocationCallback = callback;
+                    }
+            }
+
         });
+
+
 
         checkPermission();
 
@@ -90,6 +114,25 @@ public class MainActivity extends AppCompatActivity {
             webViewurl.loadUrl(URL_HOMEINSTALLERS);
         }
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_FINE_LOCATION:
+                boolean allow = false;
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // user has allowed this permission
+                    allow = true;
+                }
+                if (mGeolocationCallback != null) {
+                    // call back to web chrome client
+                    mGeolocationCallback.invoke(mGeolocationOrigin, allow, false);
+                }
+                break;
+        }
     }
 
     @Override
